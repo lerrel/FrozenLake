@@ -3,11 +3,23 @@ import numpy as np
 import gym
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import argparse
+import cloudpickle as pkl
+from IPython import embed
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--env", default='FrozenLake-v0', type=str, help="Name of environment")
+args = parser.parse_args()
+env_name = args.env
+traj_name = '{}.pkl'.format(env_name)
+print('Running Value Iteration on {}'.format(env_name))
+env = gym.make(env_name)
 
 #env = gym.make('FrozenLake8x8-v0')
-env = gym.make('FrozenLake-v0')
+#env = gym.make('FrozenLake-v0')
 #env = gym.make('FrozenLakeDet-v0')
 #env = gym.make('FrozenLake8x8Det-v0')
+
 render_viz = True
 gamma = 0.999
 test_episodes = 1
@@ -36,6 +48,7 @@ while True:
         v = values[states]
         values[states] = np.max([sum([p*(r + gamma*values[s_]) for p, s_, r, _ in env.env.P[states][a]]) for a in range(env.env.nA)])
         delta = max(delta,abs(v-values[states]))
+    # print("Delta: {}".format(delta))
     if delta < 1e-30:
         break
 
@@ -43,14 +56,18 @@ Policy = mdp_policy(values, env.env.P, env.env.nA, gamma)
 print('Testing Value Iteration')
 history = []
 bestAverage = []
-state = env.reset()
+state = env.reset()z
 if render_viz==True:
     env.render()
 
+trajs = []
 for i in range(test_episodes):
+    traj =[]
     while True:
         action = Policy.act(state)
-        state, reward, done, info = env.step(action)
+        new_state, reward, done, info = env.step(action)
+        traj.append([state, action, new_state, reward, done, info])
+        state = new_state
         if render_viz==True:
             print(action)
             env.render()
@@ -58,4 +75,5 @@ for i in range(test_episodes):
             history.append(reward)
             env.reset()
             break
-
+    trajs.append(traj)
+pkl.dump( trajs, open( 'trajs/{}'.format(traj_name), "wb" ))

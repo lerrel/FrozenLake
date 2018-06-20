@@ -46,7 +46,7 @@ class ContinuousWrapper(ObservationWrapper):
 
     def reset(self, **kwargs):
         observation = self.env.reset(**kwargs)
-        if self.reset_dist is None:
+        if not hasattr(self, 'reset_dist'):
             self.set_reset_dist(FixedResetDist(0))
         state = self.reset_dist.sample()
         if self.env.observation_space.contains(state) == True:

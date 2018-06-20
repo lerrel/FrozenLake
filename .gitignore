@@ -1,0 +1,6 @@
+models/*
+*.pkl
+*.pyc
+*.pdf
+figs/*
+exps/*
