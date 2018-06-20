@@ -56,7 +56,7 @@ Policy = mdp_policy(values, env.env.P, env.env.nA, gamma)
 print('Testing Value Iteration')
 history = []
 bestAverage = []
-state = env.reset()z
+state = env.reset()
 if render_viz==True:
     env.render()
 
